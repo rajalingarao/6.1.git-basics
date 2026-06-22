@@ -1,0 +1,259 @@
+1. Git Configuration Files
+
+Git stores settings at three levels:
+
+Level	File Location	Scope
+System	/etc/gitconfig (Linux/Mac)	All users
+Global	~/.gitconfig	Current user
+Local	.git/config	Specific repository
+
+
+
+Global Git Config
+
+Usually created when you run:
+
+git config --global user.name "John Doe"
+git config --global user.email "john@example.com"
+
+File:
+
+~/.gitconfig
+
+Example:
+
+[user]
+    name = John Doe
+    email = john@example.com
+
+[core]
+    editor = vim
+
+[init]
+    defaultBranch = main
+
+View it:
+
+cat ~/.gitconfig
+
+or
+
+git config --global --list
+2. Local Repository Files
+
+When you run:
+
+git init
+
+Git creates:
+
+project/
+└── .git/
+
+Inside .git:
+
+.git/
+├── HEAD
+├── config
+├── index
+├── objects/
+├── refs/
+├── logs/
+└── hooks/
+Repository Config
+.git/config
+
+Example:
+
+[core]
+    repositoryformatversion = 0
+    filemode = true
+
+[remote "origin"]
+    url = https://github.com/user/repo.git
+    fetch = +refs/heads/*:refs/remotes/origin/*
+
+Contains:
+
+remote URLs
+branch tracking
+repository-specific settings
+3. GitHub Authentication Methods
+
+GitHub no longer allows password authentication for Git operations.
+
+Main options:
+
+Option A: Personal Access Token (PAT)
+Option B: SSH Keys
+Option C: Git Credential Manager
+4. Personal Access Token (PAT)
+
+Create token on GitHub:
+
+Login to GitHub
+Settings
+Developer Settings
+Personal Access Tokens
+
+GitHub generates something like:
+
+github_pat_xxxxxxxxxxxxxxxxxxxxxx
+
+Important:
+
+GitHub stores it
+You should treat it like a password
+Where PAT Is Stored?
+
+Depends on configuration.
+
+Bad Practice
+
+Stored in remote URL:
+
+https://username:token@github.com/user/repo.git
+
+Visible in:
+
+git remote -v
+
+Avoid this.
+
+Better Practice
+
+Credential manager stores token securely.
+
+Windows:
+
+Windows Credential Manager
+
+Mac:
+
+Keychain Access
+
+Linux:
+
+libsecret
+
+No token file visible in repository.
+
+5. Credential Storage Files
+
+Check:
+
+git config --global credential.helper
+
+Possible outputs:
+
+Store Helper
+store
+
+Creates:
+
+~/.git-credentials
+
+Example:
+
+https://username:token@github.com
+
+⚠️ Plain text.
+
+Cache Helper
+cache
+
+Stored only in memory.
+
+No permanent file.
+
+Manager Helper
+
+Example:
+
+manager-core
+
+Uses OS secure storage.
+
+Recommended.
+
+6. SSH Authentication
+
+Most developers prefer SSH.
+
+Generate key:
+
+ssh-keygen -t ed25519 -C "john@example.com"
+
+Creates:
+
+~/.ssh/
+├── id_ed25519
+└── id_ed25519.pub
+Private Key
+~/.ssh/id_ed25519
+
+Never share.
+
+Example:
+
+-----BEGIN OPENSSH PRIVATE KEY-----
+...
+Public Key
+~/.ssh/id_ed25519.pub
+
+Safe to upload to GitHub.
+
+Example:
+
+ssh-ed25519 AAAAC3...
+7. SSH Configuration File
+
+Optional:
+
+~/.ssh/config
+
+Example:
+
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+
+Useful if you have multiple GitHub accounts.
+
+
+
+
+Quick Commands to Inspect Everything
+
+Check Git config:
+
+git config --list --show-origin
+
+Check remotes:
+
+git remote -v
+
+Check SSH keys:
+
+ls -la ~/.ssh
+
+Test GitHub SSH:
+
+ssh -T git@github.com
+
+Check credential helper:
+
+git config --global credential.helper
+
+Check GitHub CLI auth:
+
+gh auth status
+
+The most secure and commonly recommended setup today is:
+
+Configure ~/.gitconfig
+Generate an SSH key (~/.ssh/id_ed25519)
+Add the public key to GitHub
+Use SSH repository URLs (git@github.com:user/repo.git)
+Avoid storing PATs in files whenever possible.
